@@ -24,6 +24,7 @@
   1. A key is missing (e.g. no "status" key)
   2. The object is None
   3. the `amount` field is a non-numeric type like a string or even None
+  4. `orders` isn't an iterable.
 
 ### Code quality / design issues
 
@@ -33,6 +34,7 @@
 
 ### Summary of changes
 
+- Added type check for `orders`
 - Count is now calculated witin the filtering logic
 - Check if order is not `None` before trying to access the content
 - Changed index based access with the get method on the order object with default value for the `amount` field.
@@ -145,21 +147,29 @@ Aside from testing the the edge cases stated above I would perform a stress test
 
 ### Critical bugs
 
--
+- Along with some incorrect assumptions that can crash the system, it has the same bug as task number one, which didn't account for the ignored values in the denominator `count`.
 
 ### Edge cases & risks
 
--
+- Code can experience Zero Division Error under two circumstances:
+  1. The values list is empty hence `count` isn't incremented
+  2. All the values items in the list are invalid. (after correction)
+- The value of V can result in Value Error or Type Error under the following circumstances:
+  1. `v` in `values` can not be converted to float
+  2. `values` isn't an iterable.
 
 ### Code quality / design issues
 
--
+- Similar to the first two tasks, separation of concerns would be useful here as well.
 
 ## 2) Proposed Fixes / Improvements
 
 ### Summary of changes
 
--
+- Added type check for `values`
+- count is now calculated dynamically as we filter for valid measurement values
+- added try-catch block to ignore invalid measurements more rigirousely
+- Avoided zero division error by adding checks on count
 
 ### Corrected code
 
@@ -169,7 +179,7 @@ See `correct_task3.py`
 
 ### Testing Considerations
 
-If you were to test this function, what areas or scenarios would you focus on, and why?
+Similary I would go all out in testing with unconventional edge cases since the function make multiple assumptions about the incoming data.
 
 ## 3) Explanation Review & Rewrite
 
@@ -179,14 +189,15 @@ If you were to test this function, what areas or scenarios would you focus on, a
 
 ### Issues in original explanation
 
--
+- After correcting the code the explanation can work, to actually safely handle mixed inputs the explanation works, however the inital code didn't handle mixed input `safely`, as the app could have a fatal error for values that couldn't be converted to float.
 
 ### Rewritten explanation
 
--
+- This function calculates the average of valid measurements by ignoring missing values (None) and averaging the remaining values. It safely handles mixed input types and ensures an accurate average
 
 ## 4) Final Judgment
 
-- Decision: Approve / Request Changes / Reject
+- Decision: Request Changes
 - Justification:
-- Confidence & unknowns:
+  The initial code made multiple assumptions that highly critical and could result in flawed result or system failures in inprecedented ways. Which is why the correction was necessary.
+- Confidence & unknowns: After tests with some edge cases it is clear the original code was flawed, yet the new correction has resoled these flaws. Unknowns for this include whether the values could be negative as I couldn't surely assume nature of the measurments.

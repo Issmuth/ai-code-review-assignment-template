@@ -1,4 +1,7 @@
 def calculate_average_order_value(orders):
+    if not orders or not isinstance(orders, (list, tuple)):
+        return 0
+    
     total = 0
     count = 0 # not the length of the list
 
