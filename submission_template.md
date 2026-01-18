@@ -79,21 +79,32 @@ I would focus on testing different edge cases of malformed or enexpected values 
 
 ### Critical bugs
 
--
+- The validation check skips multiple steps that make an email valid, the mere existence of the '@' isn't a sufficient verification the the email is valid.
 
 ### Edge cases & risks
 
--
+- The code's logic fails in the following cases:
+  1. multiple `@`s
+  2. a string with just `@` and nothing else
+  3. No `.` for domain validity
+  4. Simply put any incorrect arrangement of the `@` and `.` sybmols e.g. `com.ismael@eskalate`
+  5. invalid characters like ` / , < , ~` can still be counted as valid emails
+  6. the email string exceeds 255 characters
+- The app could crash with TypeError in the following cases:
+  1. `emails` is None or note an iterable
+  2. if an element in the list in not a String.
 
 ### Code quality / design issues
 
--
+- Similarl to the first task separation of concerns would be great here as well, separating the validation logic from the counting logic would be more efficient since we're bound to validate emails again in other scenarios than just counting.
 
 ## 2) Proposed Fixes / Improvements
 
 ### Summary of changes
 
--
+- Added type guard for the emails list
+- Added regex pattern for cleaner validation
+- added string type and character count checks before regex matching
 
 ### Corrected code
 
@@ -103,7 +114,7 @@ See `correct_task2.py`
 
 ### Testing Considerations
 
-If you were to test this function, what areas or scenarios would you focus on, and why?
+Aside from testing the the edge cases stated above I would perform a stress test in accordance to the volumne that we typically work with to ensure performance doesn't drop.
 
 ## 3) Explanation Review & Rewrite
 
@@ -113,17 +124,18 @@ If you were to test this function, what areas or scenarios would you focus on, a
 
 ### Issues in original explanation
 
--
+- No issue besides the factual incorrectness between the intention and actual implementation.
 
 ### Rewritten explanation
 
--
+- This function counts the number of valid email addresses in the input list. It safely ignores invalid entries and handles empty input correctly.
 
 ## 4) Final Judgment
 
-- Decision: Approve / Request Changes / Reject
+- Decision: Request Changes
 - Justification:
-- Confidence & unknowns:
+  > The original code is a highly flawed and ineffective implementation, it overlooks multiple edge cases and scenarios which creates openings that can lead to wrong output or crash the entire app.
+- Confidence & unknowns: The new implementation follows standard guidelines for email validation in a typical user setting.
 
 ---
 
